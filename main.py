@@ -15,5 +15,5 @@ class Janela:
     def returnCor(self): #retorna a cor da janela
         return self.__color
 
-w = Janela(500, 500) #cria objeto janela com dimensões 500x500
+w = Janela(800, 600) #cria objeto janela com dimensões 500x500
 win = pygame.display.set_mode(w.tamanhoJanela()) #inicializa a janela do jogo
