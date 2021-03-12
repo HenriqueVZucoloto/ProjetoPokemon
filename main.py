@@ -8,15 +8,17 @@ janela = pygame.display.set_mode((800,600)) #inicializa a janela do jogo
 pygame.display.set_caption('HOJE TEM GOL DO RIBAMAR')
 
 class Cenas:
-    #Cria o cenário da batalha
-    def cenarioInicialBatalha(self):
-        #Carrega as imagens
+    #Carrega as imagens
+    def __init__(self):
         self.fundoBatalha = pygame.image.load('FundoPokemon.png')
         self.caixaTexto = pygame.image.load('text_bar.png')
         self.opcoesBatalha = pygame.image.load('fgt_options.png')
         self.barra1 = pygame.image.load('barra_1.png')
         self.barra2 = pygame.image.load('barra_2.png')
-        
+        self.caixaGolpes = pygame.image.load('pp_bar.png')
+    
+    #Cria o cenário da batalha
+    def cenarioInicialBatalha(self):
         #Ajusta o tamanho das imagens
         self.fundoBatalha = pygame.transform.scale(self.fundoBatalha, (800,440))
         self.caixaTexto = pygame.transform.scale(self.caixaTexto, (800,160))
@@ -33,14 +35,17 @@ class Cenas:
 
     #Abre a pagina de golpes
     def paginaGolpes(self):
-        self.caixaGolpes = pygame.image.load('pp_bar.png')
         self.caixaGolpes = pygame.transform.scale(self.caixaGolpes, (800,160))
         janela.blit(self.caixaGolpes, (0,440))
+    
+    #Abre a pagina da batalha
+    def paginaBatalha(self):
+        janela.blit(self.opcoesBatalha, (400,440))
 
 cenas = Cenas()
 cenas.cenarioInicialBatalha()
 cenas.paginaGolpes()
-
+cenas.paginaBatalha()
 
 #Loop do jogo
 rodando = True
