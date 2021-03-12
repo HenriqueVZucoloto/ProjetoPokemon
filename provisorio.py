@@ -42,13 +42,13 @@ class Cenas:
     def paginaBatalha(self):
         janela.blit(self.caixaTexto, (0,440))
         janela.blit(self.opcoesBatalha, (400,440))
-        
+
+#Carrega e printa o cursor        
 cursor = pygame.image.load('cursor.png')
 def posicaoCursor(cursorX, cursorY):
     janela.blit(cursor, (cursorX, cursorY))
-
-cursorX = 425
-cursorY = 480
+#Posição inicial do cursor
+cursorX, cursorY = 425, 480
 
 cenas = Cenas()
 cenas.cenarioInicialBatalha()
@@ -68,28 +68,37 @@ while jogando:
                 cursorY += 53
                 #Não deixa o cursor passar dos limites
                 if cursorY > 550:
-                    cursorY = 480+53
+                    cursorY = 533
             #Se seta para cima, move o cursor para cima
-            if event.key == pygame.K_UP:
+            elif event.key == pygame.K_UP:
                 cenas.paginaBatalha()
                 cursorY -= 53
                 #Não deixa o cursor passar dos limites
                 if cursorY < 450:
                     cursorY = 480
             #Se seta para direita, move o cursor para direita
-            if event.key == pygame.K_RIGHT:
+            elif event.key == pygame.K_RIGHT:
                 cenas.paginaBatalha()
                 cursorX += 185
                 #Não deixa o cursor passar dos limites
                 if cursorX > 650:
-                    cursorX = 425+185
+                    cursorX = 610
             #Se seta para esquerda, move o cursor para esquerda
-            if event.key == pygame.K_LEFT:
+            elif event.key == pygame.K_LEFT:
                 cenas.paginaBatalha()
                 cursorX -= 185
                 #Não deixa o cursor passar dos limites
                 if cursorX < 250:
                     cursorX = 425
+            elif event.key == pygame.K_RETURN:
+                if cursorX == 425 and cursorY == 480:
+                    print('Fight')
+                elif cursorX == 425 and cursorY == 533:
+                    print('Pokémon')
+                elif cursorX == 610 and cursorY == 480:
+                    print('Bag')
+                elif cursorX == 610 and cursorY == 533:
+                    print('Run')
 
     posicaoCursor(cursorX, cursorY)
     
