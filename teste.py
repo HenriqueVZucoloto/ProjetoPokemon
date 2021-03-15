@@ -47,11 +47,13 @@ class Cenas:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         golpesAberto = False
+                    
                     if event.key == pygame.K_DOWN:
                         janela.blit(self.caixaGolpes, (0,440))
                         cursorY += 53
                         if cursorY > 550:
                             cursorY = 533
+                    
                     elif event.key == pygame.K_UP:
                         janela.blit(self.caixaGolpes, (0,440))
                         cursorY -= 53
