@@ -5,14 +5,9 @@ class Button:
         size,
         position,
     '''
-    def __init__(self, text, size, position):
-        self.__text = text
+    def __init__(self, size, position):
         self.__size = size
         self.__position = position
-    
-    @property
-    def text(self):
-        return self.__text
     
     @property
     def size(self):
