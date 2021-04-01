@@ -193,7 +193,7 @@ class Comandos:
                         cursorY = cursor.move_up()
 
                     #Apertar enter
-                    if event.key == pygame.K_RETURN:
+                    if event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
                         blim.play()
                     # Vê onde o cursor está e executa
                         cursor_position = [cursorX, cursorY]
@@ -261,7 +261,7 @@ class Comandos:
                         cursorX = cursor.move_left()
 
                     # Ao apertar enter:
-                    if event.key == pygame.K_RETURN:
+                    if event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
                         # Vê onde o cursor está e executa
                         cursor_position = [cursorX, cursorY]
                         if cursor_position in fightButton:
@@ -318,7 +318,7 @@ class Comandos:
                         cursorY = cursor.move_up()
 
                     # Ao apertar enter
-                    if event.key == pygame.K_RETURN:
+                    if event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
                         # Ve onde o cursor está e executa
                         cursor_position = [cursorX, cursorY]
                         if cursor_position in move1Button:
