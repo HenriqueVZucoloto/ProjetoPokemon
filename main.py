@@ -19,7 +19,7 @@ beep = pygame.mixer.Sound('beep.wav')
 blim = pygame.mixer.Sound('blimm.wav')
 
 # Importa e printa o cursor        
-cursorImage = pygame.image.load('cursor.png')
+cursorImage = pygame.image.load('images/cursor.png')
 def blitCursor(cursorX, cursorY):
     screen.blit(cursorImage, (cursorX, cursorY))
 
@@ -28,12 +28,12 @@ def blitCursor(cursorX, cursorY):
 class Cenas:
     # Importa e ajusta as imagens
     def __init__(self):
-        self.__background = pygame.image.load('FundoPokemon.png')
-        self.__text_bar = pygame.image.load('text_bar.png')
-        self.__fight_options = pygame.image.load('fgt_options.png')
-        self.__health_bar1 = pygame.image.load('barra_1.png')
-        self.__health_bar2 = pygame.image.load('barra_2.png')
-        self.__pp_bar = pygame.image.load('pp_bar.png')
+        self.__background = pygame.image.load('images/FundoPokemon.png')
+        self.__text_bar = pygame.image.load('images/text_bar.png')
+        self.__fight_options = pygame.image.load('images/fgt_options.png')
+        self.__health_bar1 = pygame.image.load('images/barra_1.png')
+        self.__health_bar2 = pygame.image.load('images/barra_2.png')
+        self.__pp_bar = pygame.image.load('images/pp_bar.png')
         
         self.__background = pygame.transform.scale(self.__background, (800,440))
         self.__text_bar = pygame.transform.scale(self.__text_bar, (800,160))
@@ -42,16 +42,16 @@ class Cenas:
         self.__health_bar2 = pygame.transform.scale(self.__health_bar2, (375,126))
         self.__pp_bar = pygame.transform.scale(self.__pp_bar, (800,160))
         
-        self.__pikachucostas = pygame.image.load('pikachuCostas.png')
-        self.__pikachufrente = pygame.image.load('pikachuFrente.png')
-        self.__charizardcostas = pygame.image.load('charizardCostas.png')
-        self.__charizardfrente = pygame.image.load('charizardFrente.png')
-        self.__venusaurcostas = pygame.image.load('venusaurCostas.png')
-        self.__venusaurfrente = pygame.image.load('venusaurFrente.png')
-        self.__blastoisecostas = pygame.image.load('blastoiseCostas.png')
-        self.__blastoisefrente = pygame.image.load('blastoiseFrente.png')
-        self.__mewtwocostas = pygame.image.load('mewtwoCostas.png')
-        self.__mewtwofrente = pygame.image.load('mewtwoFrente.png')
+        self.__pikachucostas = pygame.image.load('images/pikachuCostas.png')
+        self.__pikachufrente = pygame.image.load('images/pikachuFrente.png')
+        self.__charizardcostas = pygame.image.load('images/charizardCostas.png')
+        self.__charizardfrente = pygame.image.load('images/charizardFrente.png')
+        self.__venusaurcostas = pygame.image.load('images/venusaurCostas.png')
+        self.__venusaurfrente = pygame.image.load('images/venusaurFrente.png')
+        self.__blastoisecostas = pygame.image.load('images/blastoiseCostas.png')
+        self.__blastoisefrente = pygame.image.load('images/blastoiseFrente.png')
+        self.__mewtwocostas = pygame.image.load('images/mewtwoCostas.png')
+        self.__mewtwofrente = pygame.image.load('images/mewtwoFrente.png')
 
         self.__pikachucostas = pygame.transform.scale(self.__pikachucostas, (300,300))
         self.__pikachufrente = pygame.transform.scale(self.__pikachufrente, (300,300))
@@ -173,11 +173,11 @@ class Comandos:
         listaPokemon = []
 
         #Loop da cena escolher
-        escolhendo = True
-        while escolhendo:
+        running = True
+        while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    escolhendo = False
+                    running = False
 
                 #Ve se alguma tecla foi pressionada
                 if event.type == pygame.KEYDOWN:
