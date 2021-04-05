@@ -161,9 +161,9 @@ class Cenas:
     def winner(self):
         global winner
         screen.fill((0,0,0))
-
+        
         winner = fontemenu.render((f'{winner} is the winner!'), True, (255,255,255))
-        screen.blit(winner, (50,50))
+        screen.blit(winner, (120,250))
         
         pygame.display.update()
         
