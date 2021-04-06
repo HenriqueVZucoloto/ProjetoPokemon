@@ -1,7 +1,6 @@
 import pygame
 from button import Button
 from cursor import Cursor
-from health import Health
 from time import sleep
 
 pygame.init()
@@ -17,7 +16,7 @@ fonteDisplay = pygame.font.Font('joystix monospace.ttf', 18)
 
 # Carrega os áudios
 pygame.mixer.music.load('batalha.wav')
-pygame.mixer.music.set_volume(0.3)
+pygame.mixer.music.set_volume(0.1)
 beep = pygame.mixer.Sound('beep.wav')
 blim = pygame.mixer.Sound('blimm.wav')
 
@@ -31,6 +30,69 @@ turn = 1
 listaPokemon = []
 listaMoves = []
 dmg_health = []
+
+class Health:
+    def __init__(self, health1, health2, listaPokemon):
+        self.health1 = health1
+        self.health2 = health2
+        self.initialPoint1 = 588+174
+        self. initialPoint2 = 161+157
+        self.listaPokemon = listaPokemon
+        self.red_health = pygame.image.load('images/vida_vermelha.png')
+        self.black_health = pygame.image.load('images/barra_sem_vida.png')
+    
+    def health1_decay(self, damage_taken, health1):
+        self.health1 -= damage_taken
+        
+        damagePixels = (174 * damage_taken)//health1
+        self.initialPoint1 = self.initialPoint1 - damagePixels
+
+        if self.initialPoint1 < 588:
+            self.initialPoint1 = 588
+        
+        self.red_health = pygame.transform.scale(self.red_health, (damagePixels, 10))
+        screen.blit(self.red_health, (self.initialPoint1, 372))
+        
+        return self.health1
+    
+    def health2_decay(self, damage_taken, health2):
+        self.health2 -= damage_taken
+
+        damagePixels = (157 * damage_taken)//health2
+        self.initialPoint2 = self.initialPoint2 - damagePixels
+
+        if self.initialPoint2 < 161:
+            self.initialPoint2 = 161
+
+        self.red_health = pygame.transform.scale(self.red_health, (damagePixels, 10))
+        screen.blit(self.red_health, (self.initialPoint2, 86))
+
+        return self.health2
+    
+    def check_if_is_alive(self):
+        global listaPokemon
+
+        if self.initialPoint1 <= 588:
+            self.black_health = pygame.transform.scale(self.black_health, (174, 10))
+            screen.blit(self.black_health, (588, 372))
+            pygame.display.update()
+
+            winner = listaPokemon[1]
+            sleep(5)
+
+            cenas.winner(winner)
+        
+        elif self.initialPoint2 <= 161:
+            self.black_health = pygame.transform.scale(self.black_health, (157, 10))
+            screen.blit(self.black_health, (161, 86))
+            pygame.display.update()
+
+            winner = listaPokemon[0]
+            sleep(5)
+
+            cenas.winner(winner)
+
+
 
 class Cenas:
     # Importa e ajusta as imagens
@@ -147,8 +209,6 @@ class Cenas:
             screen.blit(mewtwoNome, (50,40))
         
         
-        #pygame.mixer.music.play(0)  # Toca a música de batalha
-        
     # Abre a página de golpes
     def moves(self):
         screen.blit(self.__pp_bar, (0,440))
@@ -158,8 +218,22 @@ class Cenas:
         screen.blit(self.__text_bar, (0,440))
         screen.blit(self.__fight_options, (400,440))
 
-    def winner(self):
-        global winner
+    def attacking(self, attacker, move):
+        screen.blit(self.__text_bar, (0,440))
+        attack = fonteBatalha.render((f'{attacker} use {move}!'), True, (255,255,255))
+        screen.blit(attack, (40,480))
+        pygame.display.update()
+        sleep(2)
+
+    def run(self, fujao):
+        screen.blit(self.__text_bar, (0,440))
+        attack = fonteBatalha.render((f'{fujao} ran away!'), True, (255,255,255))
+        screen.blit(attack, (40,480))
+        pygame.display.update()
+        sleep(2)
+        
+
+    def winner(self, winner):
         screen.fill((0,0,0))
         
         winner = fontemenu.render((f'{winner} is the winner!'), True, (255,255,255))
@@ -243,11 +317,18 @@ def comandosmenu():
                         listaMoves.append('CONFUSION')
                         listaMoves.append('THUNDER')
                         dmg_health.append(50), dmg_health.append(120), dmg_health.append(416)
+                
                 if len(listaPokemon) == 2:
                     print(listaPokemon)
                     print(listaMoves)
                     print(dmg_health)
                     health = Health(dmg_health[2], dmg_health[5], listaPokemon)
+                    
+                    '''pygame.mixer.music.play(0)  # Toca a música de batalha
+                    screen.fill((0,0,0))
+                    pygame.display.update()
+                    sleep(3)'''
+
                     cenas.initial()
                     comandosbattle()
         
@@ -311,7 +392,6 @@ def comandosbattle():
                     # Vê onde o cursor está e executa
                     cursor_position = [cursorX, cursorY]
                     if cursor_position in fightButton:
-                        print('fight')
                         cenas.moves()
                         comandosmoves()
                         running = False
@@ -322,11 +402,13 @@ def comandosbattle():
                     elif cursor_position in runButton:
                         if turn == 1:
                             winner = listaPokemon[1]
+                            fujao = listaPokemon[0]
                         elif turn == 2:
                             winner = listaPokemon[0]
-                        cenas.winner()
+                            fujao = listaPokemon[1]
+                        cenas.run(fujao)
+                        cenas.winner(winner)
                         
-
         screen.blit(battleText, (40,480))
         blitCursor(cursorX, cursorY)
         pygame.display.update()
@@ -386,49 +468,46 @@ def comandosmoves():
                     cursor_position = [cursorX, cursorY]
                     if cursor_position in move1Button:
                         if turn == 1:
-                            print(f'{listaPokemon[0]} usou {listaMoves[0]}')
+                            cenas.attacking(listaPokemon[0], listaMoves[0])
                             damage_taken = dmg_health[0]
+                            
                             turn = 2
-                            if health.health2_decay(damage_taken) <= 0:
-                                winner = listaPokemon[0]
-                                cenas.winner()
-                            else:
-                                cenas.battle()
-                                comandosbattle()                                
+                            
+                            health.health2_decay(damage_taken, dmg_health[5])
+                            health.check_if_is_alive()
+                            cenas.battle()
+                            comandosbattle()                                
                             
                         elif turn == 2:
-                            print(f'{listaPokemon[1]} usou {listaMoves[2]}')
+                            cenas.attacking(listaPokemon[1], listaMoves[2])                            
                             damage_taken = dmg_health[3]
                             turn = 1
-                            if health.health1_decay(damage_taken) <= 0:
-                                winner = listaPokemon[1]
-                                cenas.winner()
-                            else:
-                                cenas.battle()
-                                comandosbattle()
+
+                            health.health1_decay(damage_taken, dmg_health[2])
+                            health.check_if_is_alive()
+                            cenas.battle()
+                            comandosbattle()
                             
                     elif cursor_position in move2Button:
                         if turn == 1:
-                            print(f'{listaPokemon[0]} usou {listaMoves[1]}')
+                            cenas.attacking(listaPokemon[0], listaMoves[1])
                             damage_taken = dmg_health[1]
                             turn = 2
-                            if health.health2_decay(damage_taken) <= 0:
-                                winner = listaPokemon[0]
-                                cenas.winner()
-                            else:
-                                cenas.battle()
-                                comandosbattle()
+
+                            health.health2_decay(damage_taken, dmg_health[5])
+                            health.check_if_is_alive()
+                            cenas.battle()
+                            comandosbattle()
                             
                         elif turn == 2:
-                            print(f'{listaPokemon[1]} usou {listaMoves[3]}')
+                            cenas.attacking(listaPokemon[1], listaMoves[3])
                             damage_taken = dmg_health[4]
                             turn = 1
-                            if health.health1_decay(damage_taken) <= 0:
-                                winner = listaPokemon[1]
-                                cenas.winner()
-                            else:
-                                cenas.battle()
-                                comandosbattle()
+
+                            health.health1_decay(damage_taken, dmg_health[2])
+                            health.check_if_is_alive()
+                            cenas.battle()
+                            comandosbattle()
             
         screen.blit(move1, (60, 480))
         screen.blit(move2, (60, 535))
