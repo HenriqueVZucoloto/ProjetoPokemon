@@ -14,11 +14,19 @@ fonteBatalha = pygame.font.Font('joystix monospace.ttf', 25)
 fontemenu = pygame.font.Font('joystix monospace.ttf', 30)
 fonteDisplay = pygame.font.Font('joystix monospace.ttf', 18)
 
+# Cria canais de som
+music_channel = pygame.mixer.Channel(0)
+music_channel.set_volume(0.1)
+
 # Carrega os áudios
-pygame.mixer.music.load('batalha.wav')
-pygame.mixer.music.set_volume(0.1)
-beep = pygame.mixer.Sound('beep.wav')
-blim = pygame.mixer.Sound('blimm.wav')
+opening_theme = pygame.mixer.Sound('sounds/fireRedAbertura.wav')
+battle_theme = pygame.mixer.Sound('sounds/batalha.wav')
+
+beep = pygame.mixer.Sound('sounds/beep.wav')
+blim = pygame.mixer.Sound('sounds/blimm.wav')
+beep.set_volume(0.2)
+blim.set_volume(0.2)
+
 
 # Importa e printa o cursor        
 cursorImage = pygame.image.load('images/cursor.png')
@@ -42,6 +50,7 @@ class Health:
         self.black_health = pygame.image.load('images/barra_sem_vida.png')
     
     def health1_decay(self, damage_taken, health1):
+        
         self.health1 -= damage_taken
         
         damagePixels = (174 * damage_taken)//health1
@@ -49,10 +58,11 @@ class Health:
 
         if self.initialPoint1 < 588:
             self.initialPoint1 = 588
-        
+
         self.red_health = pygame.transform.scale(self.red_health, (damagePixels, 10))
         screen.blit(self.red_health, (self.initialPoint1, 372))
         
+        cenas.blink_pokemon1()
         return self.health1
     
     def health2_decay(self, damage_taken, health2):
@@ -66,7 +76,8 @@ class Health:
 
         self.red_health = pygame.transform.scale(self.red_health, (damagePixels, 10))
         screen.blit(self.red_health, (self.initialPoint2, 86))
-
+        
+        cenas.blink_pokemon2()
         return self.health2
     
     def check_if_is_alive(self):
@@ -134,7 +145,7 @@ class Cenas:
         self.__mewtwofrente = pygame.transform.scale(self.__mewtwofrente, (300,300))
 
     # Tela de escolher pokémon
-    def menu(self):
+    def menu(self):        
         screen.fill((128,128,128))
         
         pygame.draw.line(screen, (0,0,0), (200,50), (200,550), 5)
@@ -167,6 +178,7 @@ class Cenas:
         screen.blit(self.__health_bar1, (30,30))
         screen.blit(self.__health_bar2, (415,310))
         
+    def blit_pokemons(self):    
         if listaPokemon[0] == 'pikachu':
             screen.blit(self.__pikachucostas, (50,172))
             pikachuNome = fonteBatalha.render('PIKACHU', True, (60,60,60))
@@ -220,10 +232,12 @@ class Cenas:
 
     def attacking(self, attacker, move):
         screen.blit(self.__text_bar, (0,440))
-        attack = fonteBatalha.render((f'{attacker} use {move}!'), True, (255,255,255))
+        attack = fonteBatalha.render((f'{attacker} used {move}!'), True, (255,255,255))
         screen.blit(attack, (40,480))
         pygame.display.update()
         sleep(2)
+        attack_sound = pygame.mixer.Sound(f'sounds/attacks/{move}.wav')
+        attack_sound.play()
 
     def run(self, fujao):
         screen.blit(self.__text_bar, (0,440))
@@ -244,6 +258,24 @@ class Cenas:
         sleep(5)
         quit()
 
+    def blink_pokemon1(self):
+        for i in range(2):    
+            screen.blit(self.__background, (0,150), pygame.Rect(0,150,400,290))
+            pygame.display.update()
+            sleep(0.2)
+            cenas.blit_pokemons()
+            pygame.display.update()
+            sleep(0.2)
+    
+    def blink_pokemon2(self):
+        for i in range(2):    
+            screen.blit(self.__background, (400,0), pygame.Rect(400,0,400,310))
+            pygame.display.update()
+            sleep(0.2)
+            cenas.blit_pokemons()
+            pygame.display.update()
+            sleep(0.2) 
+        
 
 def comandosmenu():
     global listaPokemon, listaMoves, turn, dmg_health, health
@@ -291,7 +323,8 @@ def comandosmenu():
                     cursor_position = [cursorX, cursorY]
                     if cursor_position in pikachuButton:
                         listaPokemon.append('pikachu')
-                        listaMoves.append('THUNDER SHOCK'), listaMoves.append('THUNDER')
+                        listaMoves.append('THUNDER SHOCK')
+                        listaMoves.append('THUNDER')
                         dmg_health.append(40), dmg_health.append(120), dmg_health.append(274)
                     
                     elif cursor_position in charizardButton:
@@ -324,12 +357,14 @@ def comandosmenu():
                     print(dmg_health)
                     health = Health(dmg_health[2], dmg_health[5], listaPokemon)
                     
-                    '''pygame.mixer.music.play(0)  # Toca a música de batalha
+                    music_channel.play(battle_theme, loops=-1, fade_ms=1000)  # Toca a música de batalha
+                    
                     screen.fill((0,0,0))
                     pygame.display.update()
-                    sleep(3)'''
+                    sleep(3)
 
                     cenas.initial()
+                    cenas.blit_pokemons()
                     comandosbattle()
         
         blitCursor(cursorX, cursorY)
@@ -519,6 +554,7 @@ def comandosmoves():
 
 cenas = Cenas()
 
+music_channel.play(opening_theme, loops=-1, fade_ms=1000) # Toca música de abertura
 cenas.menu()
 comandosmenu()
 
