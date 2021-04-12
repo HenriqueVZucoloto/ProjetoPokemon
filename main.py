@@ -48,6 +48,8 @@ dmg_health = [] # Dano dos golpes e vida dos pokémons selecionados
 class Cenas:
     # Importando e ajustando as imagens
     def __init__(self):
+        global text_bar
+
         self.__background = pygame.image.load('images/FundoPokemon.png')
         self.__text_bar = pygame.image.load('images/text_bar.png')
         self.__fight_options = pygame.image.load('images/fgt_options.png')
@@ -86,6 +88,8 @@ class Cenas:
 
         self.__start = pygame.image.load('images/tela_inicial.png')
         self.__start = pygame.transform.scale(self.__start, (800,600))
+        
+        text_bar = self.__text_bar
 
     # Tela inicial
     def start(self):
@@ -288,12 +292,17 @@ class Health:
     
     # Função que checa se os pokemons estão vivos
     def check_if_is_alive(self):
-        global listaPokemon
+        global listaPokemon, text_bar
         # Se o pokémon 1 morrer, dá a vitória pro pokémon 2
         if self.initialPoint1 <= 588:
             self.black_health = pygame.transform.scale(self.black_health, (174, 10))
             screen.blit(self.black_health, (588, 372))
             screen.blit(self.died, (100,230))
+            
+            screen.blit(text_bar, (0,440))
+            faint = fonteBatalha.render((f'{listaPokemon[0]} fainted!'), True, (255,255,255))
+            screen.blit(faint, (40,480))
+            
             pygame.display.update()
 
             sound_channel.play(victory_theme, fade_ms=3000) # Toca a música final
@@ -306,7 +315,12 @@ class Health:
         elif self.initialPoint2 <= 161:
             self.black_health = pygame.transform.scale(self.black_health, (157, 10))
             screen.blit(self.black_health, (161, 86))
-            screen.blit(self.died, (500,50))            
+            screen.blit(self.died, (500,50))
+
+            screen.blit(text_bar, (0,440))
+            faint = fonteBatalha.render((f'{listaPokemon[1]} fainted!'), True, (255,255,255))
+            screen.blit(faint, (40,480))
+
             pygame.display.update()
 
             sound_channel.play(victory_theme, fade_ms=3000) # Toca a música final
