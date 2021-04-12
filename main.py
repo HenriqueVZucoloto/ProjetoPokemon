@@ -15,17 +15,18 @@ fontemenu = pygame.font.Font('joystix monospace.ttf', 30)
 fonteDisplay = pygame.font.Font('joystix monospace.ttf', 18)
 
 # Cria canais de som
-music_channel = pygame.mixer.Channel(0)
-music_channel.set_volume(0.1)
+sound_channel = pygame.mixer.Channel(0)
+sound_channel.set_volume(0.1)
 
 # Carrega os áudios
 opening_theme = pygame.mixer.Sound('sounds/fireRedAbertura.wav')
 battle_theme = pygame.mixer.Sound('sounds/batalha.wav')
+run_theme = pygame.mixer.Sound('sounds/run.wav')
 
 beep = pygame.mixer.Sound('sounds/beep.wav')
 blim = pygame.mixer.Sound('sounds/blimm.wav')
 beep.set_volume(0.2)
-blim.set_volume(0.2)
+blim.set_volume(0.4)
 
 
 # Importa e printa o cursor        
@@ -48,6 +49,8 @@ class Health:
         self.listaPokemon = listaPokemon
         self.red_health = pygame.image.load('images/vida_vermelha.png')
         self.black_health = pygame.image.load('images/barra_sem_vida.png')
+        self.died = pygame.image.load('images/died.png')
+        self.died = pygame.transform.scale(self.died, (200,200))
     
     def health1_decay(self, damage_taken, health1):
         
@@ -63,6 +66,7 @@ class Health:
         screen.blit(self.red_health, (self.initialPoint1, 372))
         
         cenas.blink_pokemon1()
+
         return self.health1
     
     def health2_decay(self, damage_taken, health2):
@@ -78,6 +82,7 @@ class Health:
         screen.blit(self.red_health, (self.initialPoint2, 86))
         
         cenas.blink_pokemon2()
+
         return self.health2
     
     def check_if_is_alive(self):
@@ -86,6 +91,7 @@ class Health:
         if self.initialPoint1 <= 588:
             self.black_health = pygame.transform.scale(self.black_health, (174, 10))
             screen.blit(self.black_health, (588, 372))
+            screen.blit(self.died, (100,230))
             pygame.display.update()
 
             winner = listaPokemon[1]
@@ -96,6 +102,7 @@ class Health:
         elif self.initialPoint2 <= 161:
             self.black_health = pygame.transform.scale(self.black_health, (157, 10))
             screen.blit(self.black_health, (161, 86))
+            screen.blit(self.died, (500,50))            
             pygame.display.update()
 
             winner = listaPokemon[0]
@@ -144,8 +151,17 @@ class Cenas:
         self.__mewtwocostas = pygame.transform.scale(self.__mewtwocostas, (300,300))
         self.__mewtwofrente = pygame.transform.scale(self.__mewtwofrente, (300,300))
 
+        self.__start = pygame.image.load('images/tela_inicial.jpg')
+        self.__start = pygame.transform.scale(self.__start, (800,600))
+
+    #Tela inicial
+    def start(self):
+        start_message = fonteDisplay.render('Press any button to start', True, (255,255,255))
+        screen.blit(self.__start, (0,0))
+        screen.blit(start_message, (10, 560))
+
     # Tela de escolher pokémon
-    def menu(self):        
+    def menu(self, player):        
         screen.fill((128,128,128))
         
         pygame.draw.line(screen, (0,0,0), (200,50), (200,550), 5)
@@ -153,14 +169,14 @@ class Cenas:
         pygame.draw.line(screen, (0,0,0), (200,50), (600,50), 5)
         pygame.draw.line(screen, (0,0,0), (200,550), (600,550), 5)
     
-        texto = fontemenu.render('ESCOLHA SEU POKÉMON', True, (0,0,0))
+        text = fontemenu.render(f'CHOOSE POKÉMON {player}', True, (0,0,0))
         pokemon1 = fontemenu.render('PIKACHU', True, (255,255,0))
         pokemon2 = fontemenu.render('CHARIZARD', True, (210,105,30))
         pokemon3 = fontemenu.render('VENUSAUR', True, (0,128,0))
         pokemon4 = fontemenu.render('BLASTOISE', True, (127,212,255))
         pokemon5 = fontemenu.render('MEWTWO', True, (255,0,255))
         #inserindo textos
-        screen.blit(texto, (160,5))
+        screen.blit(text, (200,5))
         screen.blit(pokemon1, (300,150))
         screen.blit(pokemon2, (300,200))
         screen.blit(pokemon3, (300,250))
@@ -244,6 +260,7 @@ class Cenas:
         attack = fonteBatalha.render((f'{fujao} ran away!'), True, (255,255,255))
         screen.blit(attack, (40,480))
         pygame.display.update()
+        sound_channel.play(run_theme)
         sleep(2)
         
 
@@ -276,9 +293,28 @@ class Cenas:
             pygame.display.update()
             sleep(0.2) 
         
+def comandosstart():
+    global player
+    
+    sound_channel.play(opening_theme, loops=-1, fade_ms=1000)
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+
+            #Ve se alguma tecla foi pressionada
+            if event.type == pygame.KEYDOWN:
+                blim.play()
+                player = 1
+                cenas.menu(player)
+                comandosmenu()
+        
+        pygame.display.update()
+
 
 def comandosmenu():
-    global listaPokemon, listaMoves, turn, dmg_health, health
+    global listaPokemon, listaMoves, turn, dmg_health, health, player
 
     #Tamanho do botão
     button_size = (50,25)
@@ -293,27 +329,27 @@ def comandosmenu():
     # Definindo parâmetros de posição e movimento do cursor
     cursorX, cursorY = 270,150
     distanceX, distanceY = 0, 50
-    limitsX, limitsY = (1000,1000), (125, 400)
+    limitsX, limitsY = (1000,1000), (125, 351)
     cursor = Cursor(cursorX, cursorY, distanceX, distanceY, limitsX, limitsY)
 
     #Loop da cena escolher
-    running = True
-    while running:
+    while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                pygame.quit()
+                quit()
 
             #Ve se alguma tecla foi pressionada
             if event.type == pygame.KEYDOWN:
                 beep.play()
                 #Se seta para baixo, move o cursor para baixo
                 if event.key == pygame.K_DOWN:
-                    cenas.menu()
+                    cenas.menu(player)
                     cursorY = cursor.move_down()
 
                 #Se seta para cima, move o cursor para cima
                 if event.key == pygame.K_UP:
-                    cenas.menu()
+                    cenas.menu(player)
                     cursorY = cursor.move_up()
 
                 #Apertar enter
@@ -350,14 +386,14 @@ def comandosmenu():
                         listaMoves.append('CONFUSION')
                         listaMoves.append('THUNDER')
                         dmg_health.append(50), dmg_health.append(120), dmg_health.append(416)
+                    
+                    player = 2
+                    cenas.menu(player)
                 
                 if len(listaPokemon) == 2:
-                    print(listaPokemon)
-                    print(listaMoves)
-                    print(dmg_health)
                     health = Health(dmg_health[2], dmg_health[5], listaPokemon)
                     
-                    music_channel.play(battle_theme, loops=-1, fade_ms=1000)  # Toca a música de batalha
+                    sound_channel.play(battle_theme, loops=-1, fade_ms=1000)  # Toca a música de batalha
                     
                     screen.fill((0,0,0))
                     pygame.display.update()
@@ -431,9 +467,9 @@ def comandosbattle():
                         comandosmoves()
                         running = False
                     elif cursor_position in bagButton:
-                        print('bag')
+                        print('Você esqueceu a mochila em casa :P')
                     elif cursor_position in pokemonButton:
-                        print('pokemon')
+                        print("Não pode mudar de Pokémon :(")
                     elif cursor_position in runButton:
                         if turn == 1:
                             winner = listaPokemon[1]
@@ -551,13 +587,9 @@ def comandosmoves():
         pygame.display.update()
 
 
-
 cenas = Cenas()
-
-music_channel.play(opening_theme, loops=-1, fade_ms=1000) # Toca música de abertura
-cenas.menu()
-comandosmenu()
-
+cenas.start()
+comandosstart()
 
 # Loop principal
 running = True
@@ -566,7 +598,7 @@ while running:
         if event.type == pygame.QUIT:
             pygame.quit()
             quit()
-
+        
     pygame.display.update()
 
 pygame.quit()

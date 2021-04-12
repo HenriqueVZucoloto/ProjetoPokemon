@@ -9,6 +9,7 @@ class Cursor:
     limitsY
     '''
     def __init__(self, cursorX,cursorY, distanceX, distanceY, limitsX, limitsY):
+        self.__initialY = cursorY
         self.__cursorX = cursorX
         self.__cursorY = cursorY
         self.__distanceX = distanceX
@@ -21,7 +22,7 @@ class Cursor:
         if newcursorY in range(self.__limitsY[0], self.__limitsY[1]):
             self.__cursorY = newcursorY
         else:
-            self.__cursorY = self.__cursorY - self.__distanceY
+            self.__cursorY = self.__initialY
         return self.__cursorY
 
     def move_up(self):
@@ -29,7 +30,7 @@ class Cursor:
         if newcursorY in range(self.__limitsY[0], self.__limitsY[1]):
             self.__cursorY = newcursorY
         else:
-            self.__cursorY = self.__cursorY + self.__distanceY
+            self.__cursorY = self.__limitsY[1]
         return self.__cursorY
         
     def move_right(self):
