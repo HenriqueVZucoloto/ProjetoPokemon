@@ -1,119 +1,51 @@
+# Importando bibliotecas
 import pygame
+from time import sleep
+# Importando módulos
 from button import Button
 from cursor import Cursor
-from time import sleep
 
-pygame.init()
+pygame.init() # Iniciando pygame
 
-# Cria a janela e muda o nome
+# Criando a janela e mudando o nome
 screen = pygame.display.set_mode((800,600))
-pygame.display.set_caption('HOJE TEM GOL DO RIBAMAR')
+pygame.display.set_caption('Pokémon')
 
-# Importa a fonte
+# Importando a fonte
 fonteBatalha = pygame.font.Font('joystix monospace.ttf', 25)
 fontemenu = pygame.font.Font('joystix monospace.ttf', 30)
 fonteDisplay = pygame.font.Font('joystix monospace.ttf', 18)
 
-# Cria canais de som
+# Criando canais de som
 sound_channel = pygame.mixer.Channel(0)
 sound_channel.set_volume(0.1)
 
-# Carrega os áudios
+# Carregando os áudios
 opening_theme = pygame.mixer.Sound('sounds/fireRedAbertura.wav')
 battle_theme = pygame.mixer.Sound('sounds/batalha.wav')
 run_theme = pygame.mixer.Sound('sounds/run.wav')
+victory_theme = pygame.mixer.Sound('sounds/vitoria.wav')
 
 beep = pygame.mixer.Sound('sounds/beep.wav')
 blim = pygame.mixer.Sound('sounds/blimm.wav')
-beep.set_volume(0.2)
+beep.set_volume(0.2) # Diminuindo o volume
 blim.set_volume(0.4)
 
 
-# Importa e printa o cursor        
+# Sprite do cursor        
 cursorImage = pygame.image.load('images/cursor.png')
 def blitCursor(cursorX, cursorY):
     screen.blit(cursorImage, (cursorX, cursorY))
 
 # Iniciando variáveis importantes
-turn = 1
-listaPokemon = []
-listaMoves = []
-dmg_health = []
-
-class Health:
-    def __init__(self, health1, health2, listaPokemon):
-        self.health1 = health1
-        self.health2 = health2
-        self.initialPoint1 = 588+174
-        self. initialPoint2 = 161+157
-        self.listaPokemon = listaPokemon
-        self.red_health = pygame.image.load('images/vida_vermelha.png')
-        self.black_health = pygame.image.load('images/barra_sem_vida.png')
-        self.died = pygame.image.load('images/died.png')
-        self.died = pygame.transform.scale(self.died, (200,200))
-    
-    def health1_decay(self, damage_taken, health1):
-        
-        self.health1 -= damage_taken
-        
-        damagePixels = (174 * damage_taken)//health1
-        self.initialPoint1 = self.initialPoint1 - damagePixels
-
-        if self.initialPoint1 < 588:
-            self.initialPoint1 = 588
-
-        self.red_health = pygame.transform.scale(self.red_health, (damagePixels, 10))
-        screen.blit(self.red_health, (self.initialPoint1, 372))
-        
-        cenas.blink_pokemon1()
-
-        return self.health1
-    
-    def health2_decay(self, damage_taken, health2):
-        self.health2 -= damage_taken
-
-        damagePixels = (157 * damage_taken)//health2
-        self.initialPoint2 = self.initialPoint2 - damagePixels
-
-        if self.initialPoint2 < 161:
-            self.initialPoint2 = 161
-
-        self.red_health = pygame.transform.scale(self.red_health, (damagePixels, 10))
-        screen.blit(self.red_health, (self.initialPoint2, 86))
-        
-        cenas.blink_pokemon2()
-
-        return self.health2
-    
-    def check_if_is_alive(self):
-        global listaPokemon
-
-        if self.initialPoint1 <= 588:
-            self.black_health = pygame.transform.scale(self.black_health, (174, 10))
-            screen.blit(self.black_health, (588, 372))
-            screen.blit(self.died, (100,230))
-            pygame.display.update()
-
-            winner = listaPokemon[1]
-            sleep(5)
-
-            cenas.winner(winner)
-        
-        elif self.initialPoint2 <= 161:
-            self.black_health = pygame.transform.scale(self.black_health, (157, 10))
-            screen.blit(self.black_health, (161, 86))
-            screen.blit(self.died, (500,50))            
-            pygame.display.update()
-
-            winner = listaPokemon[0]
-            sleep(5)
-
-            cenas.winner(winner)
-
+turn = 1 # Define de quem é a vez de atacar
+listaPokemon = [] # Lista onde serão adicionados os pokémons selecionados
+listaMoves = [] # Golpes dos pokémons selecionados
+dmg_health = [] # Dano dos golpes e vida dos pokémons selecionados
 
 
 class Cenas:
-    # Importa e ajusta as imagens
+    # Importando e ajustando as imagens
     def __init__(self):
         self.__background = pygame.image.load('images/FundoPokemon.png')
         self.__text_bar = pygame.image.load('images/text_bar.png')
@@ -151,15 +83,22 @@ class Cenas:
         self.__mewtwocostas = pygame.transform.scale(self.__mewtwocostas, (300,300))
         self.__mewtwofrente = pygame.transform.scale(self.__mewtwofrente, (300,300))
 
-        self.__start = pygame.image.load('images/tela_inicial.jpg')
+        self.__start = pygame.image.load('images/tela_inicial.png')
         self.__start = pygame.transform.scale(self.__start, (800,600))
 
-    #Tela inicial
+    # Tela inicial
     def start(self):
         start_message = fonteDisplay.render('Press any button to start', True, (255,255,255))
         screen.blit(self.__start, (0,0))
         screen.blit(start_message, (10, 560))
-
+        pygame.display.update()
+        sleep(0.3)
+        start_message = fonteDisplay.render('Press any button to start', True, (0,0,255))
+        screen.blit(self.__start, (0,0))
+        screen.blit(start_message, (10, 560))
+        pygame.display.update()
+        sleep(0.3)
+    
     # Tela de escolher pokémon
     def menu(self, player):        
         screen.fill((128,128,128))
@@ -184,7 +123,7 @@ class Cenas:
         screen.blit(pokemon5, (300,350))
 
 
-    # Cria o cenário inicial da batalha
+    # Cenário inicial da batalha
     def initial(self):
         global listaPokemon
 
@@ -193,7 +132,8 @@ class Cenas:
         screen.blit(self.__fight_options, (400,440))
         screen.blit(self.__health_bar1, (30,30))
         screen.blit(self.__health_bar2, (415,310))
-        
+    
+    # Mostrando pokémons selecionados
     def blit_pokemons(self):    
         if listaPokemon[0] == 'pikachu':
             screen.blit(self.__pikachucostas, (50,172))
@@ -237,15 +177,16 @@ class Cenas:
             screen.blit(mewtwoNome, (50,40))
         
         
-    # Abre a página de golpes
+    # Página de golpes
     def moves(self):
         screen.blit(self.__pp_bar, (0,440))
 
-    # Abre a página de batalha
+    # Página de batalha
     def battle(self):
         screen.blit(self.__text_bar, (0,440))
         screen.blit(self.__fight_options, (400,440))
 
+    # Quando um pokémon ataca essa função faz o golpe aparecer na tela e toca seu respectivo som
     def attacking(self, attacker, move):
         screen.blit(self.__text_bar, (0,440))
         attack = fonteBatalha.render((f'{attacker} used {move}!'), True, (255,255,255))
@@ -255,16 +196,19 @@ class Cenas:
         attack_sound = pygame.mixer.Sound(f'sounds/attacks/{move}.wav')
         attack_sound.play()
 
+    # Quando um pokémon foge, essa função faz a mensagem aparecer e toca o som de fuga
     def run(self, fujao):
         screen.blit(self.__text_bar, (0,440))
-        attack = fonteBatalha.render((f'{fujao} ran away!'), True, (255,255,255))
-        screen.blit(attack, (40,480))
+        run = fonteBatalha.render((f'{fujao} ran away!'), True, (255,255,255))
+        screen.blit(run, (40,480))
         pygame.display.update()
         sound_channel.play(run_theme)
         sleep(2)
         
-
+    # Declara o vencedor e fecha o jogo
     def winner(self, winner):
+        sound_channel.play(victory_theme) # Toca a música final
+        
         screen.fill((0,0,0))
         
         winner = fontemenu.render((f'{winner} is the winner!'), True, (255,255,255))
@@ -272,9 +216,10 @@ class Cenas:
         
         pygame.display.update()
         
-        sleep(5)
+        sleep(5.5)
         quit()
 
+    # Essa função faz o pokémon 1 piscar ao tomar dano
     def blink_pokemon1(self):
         for i in range(2):    
             screen.blit(self.__background, (0,150), pygame.Rect(0,150,400,290))
@@ -284,6 +229,7 @@ class Cenas:
             pygame.display.update()
             sleep(0.2)
     
+    # Essa função faz o pokémon 2 piscar ao tomar dano
     def blink_pokemon2(self):
         for i in range(2):    
             screen.blit(self.__background, (400,0), pygame.Rect(400,0,400,310))
@@ -292,19 +238,98 @@ class Cenas:
             cenas.blit_pokemons()
             pygame.display.update()
             sleep(0.2) 
+
+# Classe responsável pela vida dos pokémons
+class Health:
+    def __init__(self, health1, health2, listaPokemon):
+        self.health1 = health1
+        self.health2 = health2
+        self.initialPoint1 = 588+174
+        self. initialPoint2 = 161+157
+        self.listaPokemon = listaPokemon
+        self.red_health = pygame.image.load('images/vida_vermelha.png')
+        self.black_health = pygame.image.load('images/barra_sem_vida.png')
+        self.died = pygame.image.load('images/died.png')
+        self.died = pygame.transform.scale(self.died, (200,200))
+    
+    # Faz a vida do pokemon 1 diminuir ao tomar dano
+    def health1_decay(self, damage_taken, health1):
         
+        self.health1 -= damage_taken
+        
+        damagePixels = (174 * damage_taken)//health1
+        self.initialPoint1 = self.initialPoint1 - damagePixels
+
+        if self.initialPoint1 < 588:
+            self.initialPoint1 = 588
+
+        self.red_health = pygame.transform.scale(self.red_health, (damagePixels, 10))
+        screen.blit(self.red_health, (self.initialPoint1, 372))
+        
+        cenas.blink_pokemon1()
+
+        return self.health1
+    
+    # Faz a vida do pokemon 2 diminuir ao tomar dano
+    def health2_decay(self, damage_taken, health2):
+        self.health2 -= damage_taken
+
+        damagePixels = (157 * damage_taken)//health2
+        self.initialPoint2 = self.initialPoint2 - damagePixels
+
+        if self.initialPoint2 < 161:
+            self.initialPoint2 = 161
+
+        self.red_health = pygame.transform.scale(self.red_health, (damagePixels, 10))
+        screen.blit(self.red_health, (self.initialPoint2, 86))
+        
+        cenas.blink_pokemon2()
+
+        return self.health2
+    
+    # Função que checa se os pokemons estão vivos
+    def check_if_is_alive(self):
+        global listaPokemon
+        # Se o pokémon 1 morrer, dá a vitória pro pokémon 2
+        if self.initialPoint1 <= 588:
+            self.black_health = pygame.transform.scale(self.black_health, (174, 10))
+            screen.blit(self.black_health, (588, 372))
+            screen.blit(self.died, (100,230))
+            pygame.display.update()
+
+            winner = listaPokemon[1]
+            sleep(5)
+
+            cenas.winner(winner)
+        # Se o pokémon 2 morrer, dá a vitória pro pokémon 1
+        elif self.initialPoint2 <= 161:
+            self.black_health = pygame.transform.scale(self.black_health, (157, 10))
+            screen.blit(self.black_health, (161, 86))
+            screen.blit(self.died, (500,50))            
+            pygame.display.update()
+            
+            winner = listaPokemon[0]
+            sleep(5)
+
+            cenas.winner(winner)
+
+# Comandos da tela inicial
 def comandosstart():
     global player
-    
+    # Toca música de abertura
     sound_channel.play(opening_theme, loops=-1, fade_ms=1000)
-    while True:
+    # Loop da tela inicial
+    running = True
+    while running:
+        cenas.start()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
 
-            #Ve se alguma tecla foi pressionada
+            # Começa o jogo ao pressionar alguma tecla
             if event.type == pygame.KEYDOWN:
+                running = False
                 blim.play()
                 player = 1
                 cenas.menu(player)
@@ -312,14 +337,14 @@ def comandosstart():
         
         pygame.display.update()
 
-
+# Comandos da tela de seleção
 def comandosmenu():
     global listaPokemon, listaMoves, turn, dmg_health, health, player
 
-    #Tamanho do botão
+    # Tamanho do botão
     button_size = (50,25)
 
-    #Definindo os botões
+    # Definindo os botões
     pikachuButton = Button(button_size, (250,150))
     charizardButton = Button(button_size, (250, 200))
     venusaurButton = Button(button_size, (250, 250))
@@ -332,31 +357,31 @@ def comandosmenu():
     limitsX, limitsY = (1000,1000), (125, 351)
     cursor = Cursor(cursorX, cursorY, distanceX, distanceY, limitsX, limitsY)
 
-    #Loop da cena escolher
+    # Loop da tela de seleção
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
 
-            #Ve se alguma tecla foi pressionada
+            # Ve se alguma tecla foi pressionada
             if event.type == pygame.KEYDOWN:
                 beep.play()
-                #Se seta para baixo, move o cursor para baixo
+                # Se seta para baixo, move o cursor para baixo
                 if event.key == pygame.K_DOWN:
                     cenas.menu(player)
                     cursorY = cursor.move_down()
 
-                #Se seta para cima, move o cursor para cima
+                # Se seta para cima, move o cursor para cima
                 if event.key == pygame.K_UP:
                     cenas.menu(player)
                     cursorY = cursor.move_up()
 
-                #Apertar enter
+                # Ao apertar enter, vê onde o cursor está e executa
                 if event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
                     blim.play()
-                    # Vê onde o cursor está e executa
                     cursor_position = [cursorX, cursorY]
+
                     if cursor_position in pikachuButton:
                         listaPokemon.append('pikachu')
                         listaMoves.append('THUNDER SHOCK')
@@ -390,15 +415,16 @@ def comandosmenu():
                     player = 2
                     cenas.menu(player)
                 
+                # Quando os dois pokémons forem selecionados, começa a batalha
                 if len(listaPokemon) == 2:
-                    health = Health(dmg_health[2], dmg_health[5], listaPokemon)
+                    health = Health(dmg_health[2], dmg_health[5], listaPokemon) # Define os parâmetros da função Health
                     
                     sound_channel.play(battle_theme, loops=-1, fade_ms=1000)  # Toca a música de batalha
                     
                     screen.fill((0,0,0))
                     pygame.display.update()
                     sleep(3)
-
+                    # Chama as funções responsáveis pela batalha
                     cenas.initial()
                     cenas.blit_pokemons()
                     comandosbattle()
@@ -406,7 +432,7 @@ def comandosmenu():
         blitCursor(cursorX, cursorY)
         pygame.display.update()
 
-# Ativa os comandos da pagina de batalha
+# Comandos da tela de batalha
 def comandosbattle():
     global turn, listaPokemon, winner
 
@@ -425,13 +451,14 @@ def comandosbattle():
     limitsX, limitsY = (425, 611), (480, 534)
     cursor = Cursor(cursorX, cursorY, distanceX, distanceY, limitsX, limitsY)
 
+    # Verifica de quem é a vez e pergunta o que fazer
     if turn == 1:
         battleText = fonteDisplay.render(f'What will {listaPokemon[0]} do?', True, (255,255,255))
     elif turn == 2:
         battleText = fonteDisplay.render(f'What will {listaPokemon[1]} do?', True, (255,255,255))
     
 
-    # Loop da cena de batalha
+    # Loop da tela de batalha
     running = True
     while running:
         for event in pygame.event.get():
@@ -458,19 +485,19 @@ def comandosbattle():
                     cenas.battle()
                     cursorX = cursor.move_left()
 
-                # Ao apertar enter:
+                # Ao apertar enter vê onde o cursor está e executa
                 if event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
-                    # Vê onde o cursor está e executa
                     cursor_position = [cursorX, cursorY]
-                    if cursor_position in fightButton:
+                    
+                    if cursor_position in fightButton: # Executa o botão FIGHT
                         cenas.moves()
                         comandosmoves()
                         running = False
-                    elif cursor_position in bagButton:
+                    elif cursor_position in bagButton: # Executa o botão BAG (não tem)
                         print('Você esqueceu a mochila em casa :P')
-                    elif cursor_position in pokemonButton:
+                    elif cursor_position in pokemonButton: # Executa o botão POKÉMON (não tem)
                         print("Não pode mudar de Pokémon :(")
-                    elif cursor_position in runButton:
+                    elif cursor_position in runButton: # Executa o botão RUN
                         if turn == 1:
                             winner = listaPokemon[1]
                             fujao = listaPokemon[0]
@@ -485,11 +512,11 @@ def comandosbattle():
         pygame.display.update()
 
 
-
+# Comandos da tela de golpes
 def comandosmoves():
     global listaMoves, turn, dmg_health, health, winner
 
-    # Define tamanho e texto dos botões
+    # Define tamanho dos botões
     button_size = (80, 80)
 
     # Define os botões
@@ -502,6 +529,7 @@ def comandosmoves():
     limitsX, limitsY = (30, 276),(480,534)
     cursor = Cursor(cursorX, cursorY, distanceX, distanceY, limitsX, limitsY)
 
+    # Verifica de quem é a vez e define seus golpes
     if turn == 1:
         move1 = fonteBatalha.render(f'{listaMoves[0]}', True, (60,60,60))
         move2 = fonteBatalha.render(f'{listaMoves[1]}', True, (60,60,60))
@@ -510,7 +538,7 @@ def comandosmoves():
         move2 = fonteBatalha.render(f'{listaMoves[3]}', True, (60,60,60))
     
     
-    # Loop da cena de golpes
+    # Loop da tela de golpes
     running = True
     while running:
         for event in pygame.event.get():
@@ -521,7 +549,7 @@ def comandosmoves():
             # Movimentos do cursor
             if event.type == pygame.KEYDOWN:
                 beep.play()
-                if event.key == pygame.K_ESCAPE:
+                if event.key == pygame.K_ESCAPE: # Ao apertar ESC, volta pra tela de batalha
                     cenas.battle()
                     comandosbattle()
                 
@@ -533,48 +561,47 @@ def comandosmoves():
                     cenas.moves()
                     cursorY = cursor.move_up()
 
-                # Ao apertar enter
+                # Ao apertar enter ve onde o cursor está e executa
                 if event.key == pygame.K_RETURN or event.key == pygame.K_KP_ENTER:
-                    # Ve onde o cursor está e executa
                     cursor_position = [cursorX, cursorY]
-                    if cursor_position in move1Button:
-                        if turn == 1:
+
+                    if cursor_position in move1Button: # Executa o primeiro golpe
+                        if turn == 1: # Pokémon 1 atacando
                             cenas.attacking(listaPokemon[0], listaMoves[0])
                             damage_taken = dmg_health[0]
                             
-                            turn = 2
-                            
+                            turn = 2 # Passa a vez pro pokémon 2
                             health.health2_decay(damage_taken, dmg_health[5])
                             health.check_if_is_alive()
                             cenas.battle()
-                            comandosbattle()                                
+                            comandosbattle()
                             
-                        elif turn == 2:
+                        elif turn == 2: # Pokémon 2 atacando
                             cenas.attacking(listaPokemon[1], listaMoves[2])                            
                             damage_taken = dmg_health[3]
-                            turn = 1
 
+                            turn = 1 # Passa a vez pro pokémon 1
                             health.health1_decay(damage_taken, dmg_health[2])
                             health.check_if_is_alive()
                             cenas.battle()
                             comandosbattle()
                             
-                    elif cursor_position in move2Button:
-                        if turn == 1:
+                    elif cursor_position in move2Button: # Executa o segundo golpe
+                        if turn == 1: # Pokémon 1 atacando
                             cenas.attacking(listaPokemon[0], listaMoves[1])
                             damage_taken = dmg_health[1]
-                            turn = 2
-
+                            
+                            turn = 2 # Passa a vez pro pokémon 2
                             health.health2_decay(damage_taken, dmg_health[5])
                             health.check_if_is_alive()
                             cenas.battle()
                             comandosbattle()
                             
-                        elif turn == 2:
+                        elif turn == 2: # Pokémon 2 atacando
                             cenas.attacking(listaPokemon[1], listaMoves[3])
                             damage_taken = dmg_health[4]
-                            turn = 1
-
+                            
+                            turn = 1 # Passa a vez pro pokémon 1
                             health.health1_decay(damage_taken, dmg_health[2])
                             health.check_if_is_alive()
                             cenas.battle()
@@ -586,19 +613,9 @@ def comandosmoves():
         
         pygame.display.update()
 
-
+# Classe cenas
 cenas = Cenas()
+
+# Inicia o jogo
 cenas.start()
 comandosstart()
-
-# Loop principal
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            quit()
-        
-    pygame.display.update()
-
-pygame.quit()
