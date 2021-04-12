@@ -1,0 +1,1 @@
+Na tela inicial, pode-se apertar qualquer tecla, mas ao apertar 'J', o Jorge conta como foi a execução do trabalho.

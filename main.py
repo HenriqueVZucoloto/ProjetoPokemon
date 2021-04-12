@@ -25,6 +25,7 @@ opening_theme = pygame.mixer.Sound('sounds/fireRedAbertura.wav')
 battle_theme = pygame.mixer.Sound('sounds/batalha.wav')
 run_theme = pygame.mixer.Sound('sounds/run.wav')
 victory_theme = pygame.mixer.Sound('sounds/vitoria.wav')
+sofrimento_py = pygame.mixer.Sound('sounds/sofrimento_py.mp3')
 
 beep = pygame.mixer.Sound('sounds/beep.wav')
 blim = pygame.mixer.Sound('sounds/blimm.wav')
@@ -207,8 +208,6 @@ class Cenas:
         
     # Declara o vencedor e fecha o jogo
     def winner(self, winner):
-        sound_channel.play(victory_theme) # Toca a música final
-        
         screen.fill((0,0,0))
         
         winner = fontemenu.render((f'{winner} is the winner!'), True, (255,255,255))
@@ -297,6 +296,8 @@ class Health:
             screen.blit(self.died, (100,230))
             pygame.display.update()
 
+            sound_channel.play(victory_theme, fade_ms=3000) # Toca a música final
+
             winner = listaPokemon[1]
             sleep(5)
 
@@ -307,7 +308,9 @@ class Health:
             screen.blit(self.black_health, (161, 86))
             screen.blit(self.died, (500,50))            
             pygame.display.update()
-            
+
+            sound_channel.play(victory_theme, fade_ms=3000) # Toca a música final
+
             winner = listaPokemon[0]
             sleep(5)
 
@@ -329,11 +332,15 @@ def comandosstart():
 
             # Começa o jogo ao pressionar alguma tecla
             if event.type == pygame.KEYDOWN:
-                running = False
-                blim.play()
-                player = 1
-                cenas.menu(player)
-                comandosmenu()
+                if event.key == pygame.K_j:
+                    pygame.mixer.pause()
+                    sofrimento_py.play()
+                else:
+                    running = False
+                    blim.play()
+                    player = 1
+                    cenas.menu(player)
+                    comandosmenu()
         
         pygame.display.update()
 
@@ -419,7 +426,7 @@ def comandosmenu():
                 if len(listaPokemon) == 2:
                     health = Health(dmg_health[2], dmg_health[5], listaPokemon) # Define os parâmetros da função Health
                     
-                    sound_channel.play(battle_theme, loops=-1, fade_ms=1000)  # Toca a música de batalha
+                    sound_channel.play(battle_theme, loops=-1, fade_ms=3000)  # Toca a música de batalha
                     
                     screen.fill((0,0,0))
                     pygame.display.update()
